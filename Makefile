@@ -28,6 +28,7 @@ ramdisk.dmg:
 	rm -rf /Volumes/ramdisk/*
 	cp -R ramdisk/* /Volumes/ramdisk/
 	sudo chown 0:0 /Volumes/ramdisk/sbin/launchd
+	sudo chmod 0755 /Volumes/ramdisk/sbin/launchd
 	umount /Volumes/ramdisk
 	xpwntool template-decrypted.dmg ramdisk.dmg -k $(RAMDISK_KEY) -iv $(RAMDISK_IV) -t $(RAMDISK_TEMPLATE)
 	rm template-decrypted.dmg

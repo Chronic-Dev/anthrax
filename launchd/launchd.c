@@ -12,35 +12,36 @@ void memset_(void *b, int c, int len);
 void mount_hfs_partition(const char *partition, const char *mnt_point, unsigned int mnt_opts);
 
 int main() {
-//	close(0); // close stdin
-//	close(1); // close stdout
-//	close(2); // close stderr
-//		
-//	int console = open("/dev/console", O_WRONLY); // open /dev/console for write only
-//	dup2(console, 0); // direct stdin->/dev/console
-//	dup2(console, 1); // direct stdout->/dev/console
-//	dup2(console, 2); // direct stderr->/dev/console
-//	
-//	struct stat check;
-//	while(stat("/dev/disk0", &check) != 0) { // wait for the drive to mount(NAND)
-//		console_print("Waiting for NAND to appear...\n");
-//		my_sleep(1);
-//	}
-//	
-//	// rootfs mount
-//	mount_hfs_partition("/dev/disk0s1", "/mnt", MNT_RDONLY); // mount root filesystem as readonly @ /mnt
-//	
-//	while(stat("/dev/disk0s1", &check)) { // wait for root filesystem to be mounted
-//		my_sleep(1);
-//	}
-//	
-//	unsigned long i = 0;
-//	while(i < 50000000) {
-//		my_sleep(1);
-//		console_print("This is a test\n");
-//		++i;
-//	}
-//	return 0;
+	close(0); // close stdin
+	close(1); // close stdout
+	close(2); // close stderr
+	
+	int console = open("/dev/console", O_WRONLY); // open /dev/console for write only
+	dup2(console, 0); // direct stdin->/dev/console
+	dup2(console, 1); // direct stdout->/dev/console
+	dup2(console, 2); // direct stderr->/dev/console
+	
+	struct stat check;
+	while(stat("/dev/disk0", &check) != 0) { // wait for the drive to mount(NAND)
+		console_print("Waiting for NAND to appear...\n");
+		my_sleep(1);
+	}
+	
+	// rootfs mount
+	mount_hfs_partition("/dev/disk0s1", "/mnt", MNT_ROOTFS | MNT_RDONLY); // mount root filesystem as readonly @ /mnt
+	
+	while(stat("/dev/disk0s1", &check)) { // wait for root filesystem to be mounted
+		console_print("Waiting for filesystem to mount...\n");
+		my_sleep(1);
+	}
+	
+	console_print("Well, we did it guys\n");
+	
+	while(1) {
+		my_sleep(1);
+	}
+	
+	return 0;
 }
 
 void console_print(const char *text) {
