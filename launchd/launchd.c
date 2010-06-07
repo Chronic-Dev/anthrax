@@ -4,6 +4,7 @@
 #include <hfs/hfs_mount.h>
 #include <mach/mach.h>
 #include <mach/mach_time.h>
+#include <unistd.h>
 
 void console_print(const char *text) {
 	const char *copy = text; // create a matching pointer 
@@ -52,7 +53,7 @@ void init() {
 	dup2(console, 2); // direct stderr->/dev/console
 	
 	struct stat check;
-	while(stat("/dev/disk0", &check)) { // wait for the drive to mount(NAND)
+	while(stat("/dev/disk0", &check) != 0) { // wait for the drive to mount(NAND)
 		console_print("Waiting for NAND to appear...\n");
 		my_sleep(1);
 	}
@@ -66,6 +67,8 @@ void init() {
 	
 	unsigned long i = 0;
 	while(i < 50000000) {
+		my_sleep(1);
+		console_print("This is a test\n");
 		++i;
 	}
 }
