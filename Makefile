@@ -11,6 +11,8 @@ RAMDISK_TEMPLATE=/Users/John/Desktop/3.1.3/018-6508-014.dmg
 LAUNCHD_SOURCES=launchd/launchd.c launchd/syscall.S
 RDKIT_SOURCES=rdkit/framebuffer.c
 
+RAMDISK_VOLUME=anthrax
+
 CFLAGS=-arch armv6 -isysroot $(SDK) -std=c99 -I./include
 LDFLAGS=-F$(SDK)/System/Library/PrivateFrameworks \
 	-framework CoreFoundation 
@@ -23,15 +25,12 @@ ramdisk/sbin/launchd:
 	ldid -S ramdisk/sbin/launchd
 
 ramdisk.dmg:
-	xpwntool $(RAMDISK_TEMPLATE) ./template-decrypted.dmg -k $(RAMDISK_KEY) -iv $(RAMDISK_IV)
-	hdid template-decrypted.dmg
-	rm -rf /Volumes/ramdisk/*
-	cp -R ramdisk/* /Volumes/ramdisk/
-	sudo chown 0:0 /Volumes/ramdisk/sbin/launchd
-	sudo chmod 0755 /Volumes/ramdisk/sbin/launchd
-	umount /Volumes/ramdisk
-	xpwntool template-decrypted.dmg ramdisk.dmg -k $(RAMDISK_KEY) -iv $(RAMDISK_IV) -t $(RAMDISK_TEMPLATE)
-	rm template-decrypted.dmg
+	hdiutil create -srcfolder ./ramdisk -align 512k -fs HFSX -volname $(RAMDISK_VOLUME) -layout NONE -format UDRW rd-dec.dmg 
+	hdiutil attach ramdisk.dmg
+	sudo chown root:wheel /Volumes/$(RAMDISK_VOLUME)/sbin/launchd
+	hdiutil detach /Volumes/$(RAMDISK_VOLUME)
+	xpwntool rd-dec.dmg ramdisk.dmg -k $(RAMDISK_KEY) -iv $(RAMDISK_IV) -t $(RAMDISK_TEMPLATE)
+	rm rd-dec.dmg
 
 clean:
 	rm -rf ramdisk.dmg
