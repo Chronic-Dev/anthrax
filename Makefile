@@ -40,7 +40,7 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
 	TARGETS = $(LAUNCHD_TARGET) $(RAMDISK_TARGET) $(ENCRYPT_TARGET)
 else
-	TARGETS = 
+	TARGETS =
 endif
 
 all: $(TARGETS)
@@ -54,11 +54,10 @@ src/launchd:
 
 ramdisk.dmg: src/launchd
 	$(CP) template.dmg ramdisk.dmg
-	$(HDIUTIL) attach ramdisk.dmg
+	hfsplus ramdisk.dmg add src/launchd /sbin/launchd
+	hfsplus ramdisk.dmg addall files/ /files
 	$(CP) src/launchd $(RAMDISK_VOLUME)/sbin/
 	$(CP) -R files/* $(RAMDISK_VOLUME)/files/
-	$(SYNC)
-	$(HDIUTIL) detach $(RAMDISK_VOLUME)
 
 ramdisk.img3: ramdisk.dmg
 	$(XPWNTOOL) ramdisk.dmg ramdisk.dmg -k $(RAMDISK_KEY) -iv $(RAMDISK_IV) -t $(RAMDISK_TEMPLATE)
